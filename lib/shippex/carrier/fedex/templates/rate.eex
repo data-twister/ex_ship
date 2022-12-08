@@ -52,8 +52,6 @@
             </ShippingChargesPayment>
             <RateRequestTypes><%= Shippex.Carrier.Fedex.Client.service_code(@service) %></RateRequestTypes>
             <PackageCount><%= Enum.count(@shipment.packages) %></PackageCount>
-             <%= for package <- @shipment.packages do
-             for item <- package do: item.name <> "\n"
-            end %>
+
 			</RequestedShipment>
       </RateRequest>

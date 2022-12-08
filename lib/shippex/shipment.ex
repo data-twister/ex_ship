@@ -26,10 +26,11 @@ defmodule Shippex.Shipment do
   @doc """
   Builds a `Shipment`.
   """
-  @spec new(Address.t(), Address.t(), Package.t(), Keyword.t()) ::
+  @spec new(Address.t(), Address.t(), List.t(), Keyword.t()) ::
           {:ok, t()} | {:error, String.t()}
-  def new(%Address{} = from, %Address{} = to, %Package{} = package, opts \\ []) do
+  def new(%Address{} = from, %Address{} = to, packages \\ [], opts \\ []) do
     ship_date = Keyword.get(opts, :ship_date)
+    params = Keyword.get(opts, :params)
 
     if from.country != "US" do
       throw({:error, "Shippex does not yet support shipments originating outside of the US."})
@@ -38,52 +39,16 @@ defmodule Shippex.Shipment do
     if not (is_nil(ship_date) or match?(%Date{}, ship_date)) do
       throw({:error, "Invalid ship date: #{ship_date}"})
     end
+
+    package = List.first(packages)
 
     shipment = %Shipment{
       from: from,
       to: to,
       package: package,
-      packages: [package],
-      ship_date: ship_date
-    }
-
-    {:ok, shipment}
-  catch
-    {:error, _} = e -> e
-  end
-
-  @doc """
-  Builds a `Shipment`. Raises on failure.
-  """
-  @spec new!(Address.t(), Address.t(), Package.t(), Keyword.t()) :: t() | none()
-  def new!(%Address{} = from, %Address{} = to, %Package{} = package, opts \\ []) do
-    case new(from, to, package, opts) do
-      {:ok, shipment} -> shipment
-      {:error, error} -> raise error
-    end
-  end
-
-  @doc """
-  Builds a `Shipment`.
-  """
-  @spec new(Address.t(), Address.t(), List.t(), Keyword.t()) ::
-          {:ok, t()} | {:error, String.t()}
-  def new(%Address{} = from, %Address{} = to, [] = packages, opts \\ []) do
-    ship_date = Keyword.get(opts, :ship_date)
-
-    if from.country != "US" do
-      throw({:error, "Shippex does not yet support shipments originating outside of the US."})
-    end
-
-    if not (is_nil(ship_date) or match?(%Date{}, ship_date)) do
-      throw({:error, "Invalid ship date: #{ship_date}"})
-    end
-
-    shipment = %Shipment{
-      from: from,
-      to: to,
       packages: packages,
-      ship_date: ship_date
+      ship_date: ship_date,
+      params: params
     }
 
     {:ok, shipment}
@@ -100,5 +65,9 @@ defmodule Shippex.Shipment do
       {:ok, shipment} -> shipment
       {:error, error} -> raise error
     end
+  end
+
+  defmodule Manifest do
+
   end
 end
