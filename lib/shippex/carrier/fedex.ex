@@ -456,7 +456,9 @@ defmodule Shippex.Carrier.Fedex do
     ISO.country_name(code, :informal)
   end
 
-  defp container(%Shipment{package: package}) do
+  defp container(%Shipment{packages: packages}) do
+    package = List.first(packages)
+
     case Package.usps_containers()[package.container] do
       nil -> Package.usps_containers()[@default_container]
       container -> container
@@ -464,7 +466,9 @@ defmodule Shippex.Carrier.Fedex do
     |> String.upcase()
   end
 
-  defp size(%Shipment{package: package} = shipment) do
+  defp size(%Shipment{packages: packages} = shipment) do
+    package = List.first(packages)
+
     is_large? =
       cond do
         container(shipment) == "RECTANGULAR" ->
@@ -491,7 +495,7 @@ defmodule Shippex.Carrier.Fedex do
 
   def config() do
     with cfg when is_list(cfg) <-
-           Keyword.get(Config.config(), :ups, {:error, :not_found}),
+           Keyword.get(Config.config(), :fedex, {:error, :not_found}),
          sk when is_binary(sk) <-
            Keyword.get(cfg, :secret_key, {:error, :not_found, :secret_key}),
          sh when is_map(sh) <- Keyword.get(cfg, :shipper, {:error, :not_found, :shipper}),
@@ -510,18 +514,18 @@ defmodule Shippex.Carrier.Fedex do
       {:error, :not_found, :shipper} ->
         raise InvalidConfigError,
           message:
-            "UPS shipper config key missing. This could be because was provided as a keyword list instead of a map."
+            "Fedex shipper config key missing. This could be because was provided as a keyword list instead of a map."
 
       {:error, :not_found, token} ->
-        raise InvalidConfigError, message: "UPS config key missing: #{token}"
+        raise InvalidConfigError, message: "Fedex config key missing: #{token}"
 
       {:error, :not_found} ->
-        raise InvalidConfigError, message: "UPS config is either invalid or not found."
+        raise InvalidConfigError, message: "Fedex config is either invalid or not found."
     end
   end
 
   @impl true
   def carrier() do
-    :usps
+    :fedex
   end
 end
