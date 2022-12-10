@@ -10,14 +10,13 @@ defmodule Shippex.Shipment do
 
   alias Shippex.{Shipment, Address, Package}
 
-  @enforce_keys [:from, :to, :package, :ship_date, :packages, :params]
-  defstruct [:id, :from, :to, :package, :ship_date, :packages, :params]
+  @enforce_keys [:from, :to, :ship_date, :packages, :params]
+  defstruct [:id, :from, :to, :ship_date, :packages, :params]
 
   @type t :: %__MODULE__{
           id: any(),
           from: Address.t(),
           to: Address.t(),
-          package: Package.t(),
           packages: List.t(),
           ship_date: any(),
           params: any()
@@ -40,12 +39,9 @@ defmodule Shippex.Shipment do
       throw({:error, "Invalid ship date: #{ship_date}"})
     end
 
-    package = List.first(packages)
-
     shipment = %Shipment{
       from: from,
       to: to,
-      package: package,
       packages: packages,
       ship_date: ship_date,
       params: params
@@ -68,6 +64,5 @@ defmodule Shippex.Shipment do
   end
 
   defmodule Manifest do
-
   end
 end
