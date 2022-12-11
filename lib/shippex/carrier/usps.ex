@@ -20,18 +20,18 @@ defmodule Shippex.Carrier.USPS do
   @destination_entry_facility_type ~w(DDU DNDC DCSF NONE)a
 
   @typep flat_rate_container() :: %{
-    name: String.t(),
-    rate: integer(),
-    length: number(),
-    width: number(),
-    height: number()
-  }
+           name: String.t(),
+           rate: integer(),
+           length: number(),
+           width: number(),
+           height: number()
+         }
 
   for f <-
         ~w(address cancel carrier_pickup_availability city_state_by_zipcode express_mail_commitments first_class_service_standards hold_for_pickup package_pickup_cancel package_pickup_change package_pickup_inquery package_pickup_schedule package_service_standardb priority_mail_service_standards proof_of_delivery return_label return_receipt label rate scan sdc_get_locations sunday_holiday track track_confirm_by_email track_fields validate_address zipcode)a do
     EEx.function_from_file(
       :defp,
-      :"render_#{f}",
+      :"build_#{f}_request",
       __DIR__ <> "/usps/templates/#{f}.eex",
       [
         :assigns
@@ -85,7 +85,7 @@ defmodule Shippex.Carrier.USPS do
         "RateV4"
       end
 
-    rate_request = String.trim(render_rate(shipment: shipment, service: service))
+    rate_request = String.trim(build_rate_request(shipment: shipment, service: service))
 
     with_response Client.post("ShippingAPI.dll", %{API: api, XML: rate_request}, %{
                     "Content-Type" => "application/xml"
@@ -193,7 +193,7 @@ defmodule Shippex.Carrier.USPS do
           """
       end
 
-    request = render_label(shipment: shipment, service: service, api: api)
+    request = build_label_request(shipment: shipment, service: service, api: api)
 
     with_response Client.post("ShippingAPI.dll", %{API: api, XML: request}) do
       spec =
@@ -239,7 +239,7 @@ defmodule Shippex.Carrier.USPS do
 
     api = root <> "Cancel"
 
-    request = render_cancel(root: root, tracking_number: tracking_number)
+    request = build_cancel_request(root: root, tracking_number: tracking_number)
 
     with_response Client.post("ShippingAPI.dll", %{API: api, XML: request}) do
       data =
@@ -404,7 +404,7 @@ defmodule Shippex.Carrier.USPS do
 
   @impl true
   def validate_address(%Shippex.Address{country: "US"} = address) do
-    request = render_validate_address(address: address)
+    request = build_validate_address_request(address: address)
 
     with_response Client.post("", %{API: "Verify", XML: request}) do
       candidates =
@@ -434,7 +434,7 @@ defmodule Shippex.Carrier.USPS do
   end
 
   def track_parcels(tracking_numbers) when is_list(tracking_numbers) do
-    request = render_track(tracking_numbers: tracking_numbers)
+    request = build_track_request(tracking_numbers: tracking_numbers)
 
     with_response Client.post("ShippingAPI.dll", %{API: "TrackV2", XML: request}) do
       {:ok,
@@ -475,20 +475,20 @@ defmodule Shippex.Carrier.USPS do
   """
   @spec containers() :: %{atom() => String.t()}
   defp containers() do
-      %{
-        box_large: "Lg Flat Rate Box",
-        box_medium: "Md Flat Rate Box",
-        box_small: "Sm Flat Rate Box",
-        envelope: "Flat Rate Envelope",
-        envelope_gift_card: "Gift Card Flat Rate Envelope",
-        envelope_legal: "Legal Flat Rate Envelope",
-        envelope_padded: "Padded Flat Rate Envelope",
-        envelope_small: "Sm Flat Rate Envelope",
-        envelope_window: "Window Flat Rate Envelope",
-        nonrectangular: "Nonrectangular",
-        rectangular: "Rectangular",
-        variable: "Variable"
-      }
+    %{
+      box_large: "Lg Flat Rate Box",
+      box_medium: "Md Flat Rate Box",
+      box_small: "Sm Flat Rate Box",
+      envelope: "Flat Rate Envelope",
+      envelope_gift_card: "Gift Card Flat Rate Envelope",
+      envelope_legal: "Legal Flat Rate Envelope",
+      envelope_padded: "Padded Flat Rate Envelope",
+      envelope_small: "Sm Flat Rate Envelope",
+      envelope_window: "Window Flat Rate Envelope",
+      nonrectangular: "Nonrectangular",
+      rectangular: "Rectangular",
+      variable: "Variable"
+    }
   end
 
   @doc """

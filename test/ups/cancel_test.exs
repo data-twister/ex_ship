@@ -2,7 +2,7 @@ defmodule Shippex.UPS.CancellationTest do
   use ExUnit.Case
 
   setup do
-    [shipment: Helper.valid_shipment]
+    [shipment: Helper.valid_shipment()]
   end
 
   test "successfully void shipment label", %{shipment: shipment} do

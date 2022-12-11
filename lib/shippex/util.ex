@@ -198,7 +198,6 @@ defmodule Shippex.Util do
         [_, "Shippex", "Carrier", "Client"] -> false
         ["Shippex", "Carrier", _] -> true
         [_, "Shippex", "Carrier", _] -> true
-
         _ -> false
       end
     end)

@@ -1,5 +1,4 @@
 defmodule Shippex.Country do
-
   def country(%{country: code}) do
     country(code)
   end
@@ -24,4 +23,4 @@ defmodule Shippex.Country do
   def country(code) do
     ISO.country_name(code, :informal)
   end
- end
+end

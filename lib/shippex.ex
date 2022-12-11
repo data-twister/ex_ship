@@ -73,10 +73,10 @@ defmodule Shippex do
           """
       end
 
-
     services
-      |> Enum.reject(&(Service.get(&1).carrier in carriers))
-##
+    |> Enum.reject(&(Service.get(&1).carrier in carriers))
+
+    ##
 
     carrier_tasks =
       Enum.map(carriers, fn carrier ->

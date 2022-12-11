@@ -23,7 +23,7 @@ defmodule Shippex.Address do
           state: String.t(),
           postal_code: String.t(),
           type: String.t(),
-    valid: String.t(),
+          valid: String.t(),
           meta: String.t(),
           country: ISO.country_code()
         }

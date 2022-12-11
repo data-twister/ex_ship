@@ -7,7 +7,7 @@ defmodule Shippex.Pickup do
 
   alias Shippex.{Pickup, Address, Parcel}
 
-  @enforce_keys [:from, :to,  :pickup_date, :parcels, :params]
+  @enforce_keys [:from, :to, :pickup_date, :parcels, :params]
   defstruct [:id, :from, :to, :pickup_date, :parcels, :params]
 
   @type t :: %__MODULE__{
@@ -18,5 +18,4 @@ defmodule Shippex.Pickup do
           pickup_date: any(),
           params: any()
         }
-
 end

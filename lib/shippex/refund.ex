@@ -9,7 +9,7 @@ defmodule Shippex.Refund do
   defstruct [:status, :transaction]
 
   @type t :: %__MODULE__{
-    status: String.t(),
-    transaction: String.t()
+          status: String.t(),
+          transaction: String.t()
         }
 end

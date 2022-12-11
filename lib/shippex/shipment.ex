@@ -33,7 +33,7 @@ defmodule Shippex.Shipment do
           ship_date: any(),
           return_address: any(),
           customs_declaration: any(),
-    meta: any()
+          meta: any()
         }
 
   @doc """
