@@ -10,16 +10,30 @@ defmodule Shippex.Shipment do
 
   alias Shippex.{Shipment, Address}
 
-  @enforce_keys [:from, :to, :ship_date, :parcels, :params]
-  defstruct [:id, :from, :to, :ship_date, :parcels, :params]
+  @enforce_keys [:from, :to, :ship_date, :parcels]
+  defstruct [
+    :id,
+    :from,
+    :to,
+    :ship_date,
+    :parcels,
+    :extra,
+    :meta,
+    :return_address,
+    :customs_declaration,
+    :carrier_accounts
+  ]
 
   @type t :: %__MODULE__{
           id: any(),
           from: Address.t(),
           to: Address.t(),
           parcels: List.t(),
+          carrier_accounts: List.t(),
           ship_date: any(),
-          params: any()
+          return_address: any(),
+          customs_declaration: any(),
+    meta: any()
         }
 
   @doc """
@@ -29,7 +43,7 @@ defmodule Shippex.Shipment do
           {:ok, t()} | {:error, String.t()}
   def new(%Address{} = from, %Address{} = to, parcels \\ [], opts \\ []) do
     ship_date = Keyword.get(opts, :ship_date)
-    params = Keyword.get(opts, :params)
+    meta = Keyword.get(opts, :meta)
 
     if from.country != "US" do
       throw({:error, "Shippex does not yet support shipments originating outside of the US."})
@@ -44,7 +58,7 @@ defmodule Shippex.Shipment do
       to: to,
       parcels: parcels,
       ship_date: ship_date,
-      params: params
+      meta: meta
     }
 
     {:ok, shipment}
@@ -61,5 +75,14 @@ defmodule Shippex.Shipment do
       {:ok, shipment} -> shipment
       {:error, error} -> raise error
     end
+  end
+
+  defmodule Manifest do
+    defstruct carrier_account: nil,
+              status: nil,
+              shipment_date: nil,
+              address_from: nil,
+              transactions: [],
+              documents: []
   end
 end

@@ -17,6 +17,7 @@ defmodule Shippex.Parcel do
       Shippex.Parcel.parcel(%{length: 8
                                 width: 8,
                                 height: 8,
+                                distance_unit: :cm,
                                 items: [
                                   %{weight: 1, monetary_value: 100, description: "A"},
                                   %{weight: 2, monetary_value: 200, description: "B"}
@@ -28,7 +29,7 @@ defmodule Shippex.Parcel do
   alias Shippex.Item
 
   @enforce_keys [:length, :width, :height, :weight, :items, :monetary_value, :description]
-  @fields ~w(length width height weight girth container insurance monetary_value description items)a
+  @fields ~w(length width height weight girth container insurance monetary_value description items distance_unit mass_unit meta extra)a
   defstruct @fields
 
   @type t() :: %__MODULE__{
@@ -36,8 +37,12 @@ defmodule Shippex.Parcel do
           width: number(),
           height: number(),
           weight: number(),
+          distance_unit: atom(),
+          mass_unit: atom(),
           monetary_value: number(),
           girth: nil | number(),
+          meta: nil | string(),
+          extra: nil | string(),
           container: nil | atom() | String.t(),
           insurance: nil | number(),
           description: nil | String.t(),
@@ -78,16 +83,39 @@ defmodule Shippex.Parcel do
           |> Enum.join(", ")
       end
 
+    mass_unit = :oz
+    distance_unit = :in
+
     attrs =
       attrs
       |> Map.merge(%{
         items: items,
         weight: weight,
         monetary_value: monetary_value,
-        description: description
+        description: description,
+        mass_unit: mass_unit,
+        distance_unit: distance_unit
       })
       |> Map.take(@fields)
 
     struct(__MODULE__, attrs)
   end
+end
+
+defmodule Shippex.Parcel.Extras do
+  defstruct cod: nil,
+            insurance: nil
+end
+
+defmodule Shippex.Parcel.Extras.Cod do
+  defstruct amount: nil,
+            currency: nil,
+            payment_method: nil
+end
+
+defmodule Shippex.Parcel.Extras.Insurance do
+  defstruct amount: nil,
+            currency: nil,
+            content: nil,
+            provider: nil
 end
