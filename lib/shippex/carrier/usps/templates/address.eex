@@ -1,8 +1,8 @@
 <%# Prefix is either "From" or "To" %>
 <%# Address1 is actually line 2 %>
 <%# Zip4 can be blank %>
-<% prefix = String.capitalize("#{@address}") %>
-<% address = Map.get(@shipment, @address) %>
+<% prefix = String.capitalize(@type) %>
+<% address = @address %>
 
 <%= if international?(@shipment) do %>
   <<%= prefix %>FirstName><%= address.first_name %></<%= prefix %>FirstName>

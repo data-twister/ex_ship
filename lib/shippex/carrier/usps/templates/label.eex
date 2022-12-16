@@ -1,4 +1,4 @@
-<% parcels = @shipment.parcel %>
+<% parcels = @shipment.parcels %>
 <% username = config().username %>
 <% hs_tariff_number = Map.get(config(), :hs_tariff_number, "") %>
 <% agreement = Map.get(config(), :agreement, "Y") %>
@@ -10,8 +10,8 @@
 <<%= @api %>Request USERID='<%= username %>'>
   <%= if international?(@shipment) do %>
     <Revision>2</Revision>
-    <%= build_address_request shipment: @shipment, address: @shipment.from %>
-    <%= build_address_request shipment: @shipment, address: @shipment.to %>
+    <%= build_address_request shipment: @shipment, address: @shipment.from, type: "from" %>
+    <%= build_address_request shipment: @shipment, address: @shipment.to, type: "to" %>
 
 <%= for package <- parcels do %>
     <Container><%= container(package) %></Container>
@@ -49,8 +49,8 @@
     <% end %>
     <% end %>
   <% else %>
-    <%= build_address_request shipment: @shipment, address: @shipment.from %>
-    <%= build_address_request shipment: @shipment, address: @shipment.to %>
+    <%= build_address_request shipment: @shipment, address: @shipment.from,  type: "from" %>
+    <%= build_address_request shipment: @shipment, address: @shipment.to,  type: "to" %>
 <%= for package <- parcels do %>
     <WeightInOunces><%= weight_in_ounces(package.weight) %></WeightInOunces>
     <ServiceType><%= Service.service_code(@service) %></ServiceType>
